@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")/.."
 DATASET_ALIAS="${1:-null}"
 resolve_dataset() {
   case "$1" in

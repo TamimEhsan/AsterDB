@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")/.."
 #!/bin/bash
 declare -A bfs_start_vertex
 declare -A sssp_start_vertex

@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")/.."
 # datasets=('twitch.json3')
 # datasets=('com-orkut.ungraph.json3')
 datasets=('wikitalk.json3' 'com-dblp.ungraph.json3' )

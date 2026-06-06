@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")/.."
 # datasets=('twitch.json3')
 # datasets=('com-orkut.ungraph.json3')
 # datasets=('com-dblp.ungraph.json3')
@@ -41,7 +42,7 @@ do
     if [[ $update != 2 ]]; then
       rm -rf /tmp/demo
       ./bulkload --dataset=../graph-baselines/runtime/data/$ds --is_undirected=$undirect
-      cp warmup.groovy tmp.groovy
+      cp scripts/warmup.groovy tmp.groovy
       sed -i "s/conf.setProperty(\"updatePolicy\", 2)/conf.setProperty(\"updatePolicy\", $update)/g" tmp.groovy
       bin/gremlin.sh -e tmp.groovy
       rm -rf /tmp/warmup && cp -r /tmp/demo /tmp/warmup

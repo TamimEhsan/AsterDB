@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")/.."
 mkdir dataset
 python3 scripts/process_property_ldbc.py
 python3 scripts/process_property_freebase.py
