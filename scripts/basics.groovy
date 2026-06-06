@@ -1,6 +1,6 @@
 conf = new BaseConfiguration();
 conf.setProperty("updatePolicy", 2); // adaptive
-graph = TinkerGraph.open(conf);
+graph = AsterGraph.open(conf);
 g = graph.traversal();
 
 total_ops = 100000;

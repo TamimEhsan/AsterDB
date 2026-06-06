@@ -1,6 +1,6 @@
 conf = new BaseConfiguration();
 conf.setProperty("updatePolicy", 2);
-graph = TinkerGraph.open(conf);
+graph = AsterGraph.open(conf);
 g = graph.traversal();
 graph.currentVertexId = GRAPH_VERTEX_NUM;
 

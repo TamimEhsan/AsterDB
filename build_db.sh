@@ -13,4 +13,4 @@ cd ../..
 mvn install:install-file \
     -Dfile=GraphKV/java/target/rocksdbjni-8.9.0-linux64.jar -DgroupId=org.rocksdb -DartifactId=rocksdbjni -Dversion=8.9.0 \
     -Dpackaging=jar -DlocalRepositoryPath=$HOME/.m2/repository/
-mvn clean install -pl tinkergraph-gremlin,gremlin-console -Dmaven.test.skip=true
+mvn clean install -pl asterdb-gremlin -Dmaven.test.skip=true

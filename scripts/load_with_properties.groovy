@@ -2,7 +2,7 @@
 dataset = PATH_TO_DATASET
 conf = new BaseConfiguration();
 conf.setProperty("updatePolicy", 0); // eager
-graph = TinkerGraph.open(conf);
+graph = AsterGraph.open(conf);
 g = graph.traversal();
 
 // load vertex

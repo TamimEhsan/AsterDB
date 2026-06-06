@@ -69,7 +69,7 @@ def loadTxtGraph(filename, vertexNum, isUndirected, graphToWrite) {
 
 conf = new BaseConfiguration();
 conf.setProperty("updatePolicy", 3);
-graph = TinkerGraph.open(conf);
+graph = AsterGraph.open(conf);
 graph.setWorkload(1); // 100% read
 
 loadTxtGraph(dataset, total_vertex_num, is_undirected, graph);

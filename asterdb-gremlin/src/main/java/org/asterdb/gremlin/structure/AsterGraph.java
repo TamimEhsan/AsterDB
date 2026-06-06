@@ -3,11 +3,13 @@ package org.asterdb.gremlin.structure;
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer;
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategies;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
+import org.asterdb.gremlin.process.traversal.strategy.optimization.AsterGraphStepStrategy;
 import org.rocksdb.RocksGraph;
 
 import java.util.ArrayList;
@@ -19,6 +21,12 @@ import java.util.Set;
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
 public class AsterGraph implements Graph, AutoCloseable {
+
+    static {
+        TraversalStrategies.GlobalCache.registerStrategies(AsterGraph.class,
+                TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone().addStrategies(
+                        AsterGraphStepStrategy.instance()));
+    }
 
     private static final String ASTER_UPDATE_POLICY = "updatePolicy";
 

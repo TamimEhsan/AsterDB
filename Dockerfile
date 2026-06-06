@@ -48,7 +48,7 @@ RUN mvn install:install-file \
     -Dversion=8.9.0 \
     -Dpackaging=jar \
     -DlocalRepositoryPath=/root/.m2/repository
-RUN mvn clean install -pl tinkergraph-gremlin,gremlin-console -Dmaven.test.skip=true
+RUN mvn clean install -pl asterdb-gremlin -Dmaven.test.skip=true
 
 # Add entrypoint wrapper
 RUN printf '%s\n' '#!/usr/bin/env sh' \
