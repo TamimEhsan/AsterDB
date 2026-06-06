@@ -144,6 +144,7 @@ limitations under the License.
         <module>gremlint</module>
         <module>gremlin-util</module>
         <module>rocksdbbench</module>
+        <module>asterdb-gremlin</module>
     </modules>
     <scm>
         <connection>scm:git:git@github.com:apache/tinkerpop.git</connection>
