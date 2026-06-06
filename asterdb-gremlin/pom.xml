@@ -26,15 +26,14 @@
             <version>${tinkerpop.version}</version>
         </dependency>
 
-        <!-- Custom GraphKV JNI JAR — must be built from the GraphKV submodule
-             and installed to local repo via build_db.sh before runtime use.
-             Uncomment when porting RocksDB logic in Stage 2.
+        <!-- Custom GraphKV JNI JAR — built from the GraphKV submodule.
+             Install to local repo via build_db.sh before full builds.
+             A stub JAR is used during development for compilation. -->
         <dependency>
             <groupId>org.rocksdb</groupId>
             <artifactId>rocksdbjni</artifactId>
             <version>8.9.0</version>
         </dependency>
-        -->
 
         <dependency>
             <groupId>commons-io</groupId>

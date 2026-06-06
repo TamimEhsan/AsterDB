@@ -5,13 +5,16 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
+import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AsterEdge extends AsterElement implements Edge {
 
@@ -30,28 +33,48 @@ public class AsterEdge extends AsterElement implements Edge {
 
     @Override
     public Vertex outVertex() {
-        throw new UnsupportedOperationException("AsterEdge.outVertex() not yet implemented");
+        return this.graph.vertex(this.outVertexId);
     }
 
     @Override
     public Vertex inVertex() {
-        throw new UnsupportedOperationException("AsterEdge.inVertex() not yet implemented");
+        return this.graph.vertex(this.inVertexId);
     }
 
     @Override
     public Iterator<Vertex> vertices(final Direction direction) {
-        throw new UnsupportedOperationException("AsterEdge.vertices() not yet implemented");
+        switch (direction) {
+            case OUT:
+                return IteratorUtils.of(outVertex());
+            case IN:
+                return IteratorUtils.of(inVertex());
+            default:
+                return IteratorUtils.of(outVertex(), inVertex());
+        }
     }
 
     @Override
     public <V> Property<V> property(final String key, final V value) {
-        throw new UnsupportedOperationException("AsterEdge.property() not yet implemented");
+        graph.addEdgeProperty(this.id, key, value);
+        final Property<V> newProperty = new AsterProperty<>(this, key, value);
+        this.properties.put(key, newProperty);
+        return newProperty;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <V> Iterator<Property<V>> properties(final String... propertyKeys) {
-        return Collections.emptyIterator();
+        if (this.properties == null) return Collections.emptyIterator();
+        if (propertyKeys.length == 1) {
+            if (propertyKeys[0] == null) return Collections.emptyIterator();
+            final Property<V> property = this.properties.get(propertyKeys[0]);
+            return property == null ? Collections.emptyIterator() : IteratorUtils.of(property);
+        } else {
+            return (Iterator) this.properties.entrySet().stream()
+                    .filter(entry -> ElementHelper.keyExists(entry.getKey(), propertyKeys))
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toList()).iterator();
+        }
     }
 
     @Override
@@ -67,7 +90,7 @@ public class AsterEdge extends AsterElement implements Edge {
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("AsterEdge.remove() not yet implemented");
+        this.graph.removeEdge(this.id);
     }
 
     @Override

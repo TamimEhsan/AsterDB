@@ -7,34 +7,43 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
+import org.rocksdb.RocksGraph;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
 public class AsterGraph implements Graph, AutoCloseable {
 
-    private static final String GREMLIN_GRAPH = "gremlin.graph";
     private static final String ASTER_UPDATE_POLICY = "updatePolicy";
 
     private final Configuration configuration;
     private final AsterGraphFeatures features = new AsterGraphFeatures();
-    private AsterGraphStore store;
+    private final AsterGraphStore store;
     private long currentVertexId = 0L;
 
     private AsterGraph(final Configuration configuration) {
         this.configuration = configuration;
+        int updatePolicy = configuration.getInt(ASTER_UPDATE_POLICY, 0);
+        RocksGraph db = AsterGraphStore.openDatabase(updatePolicy);
+        this.store = new AsterGraphStore(db, this);
+        this.currentVertexId = store.vertexCount();
     }
 
     public static AsterGraph open() {
         final Configuration config = new BaseConfiguration();
-        config.setProperty(GREMLIN_GRAPH, AsterGraph.class.getName());
+        config.setProperty(Graph.GRAPH, AsterGraph.class.getName());
         config.setProperty(ASTER_UPDATE_POLICY, 0);
         return open(config);
     }
 
     public static AsterGraph open(final int updatePolicy) {
         final Configuration config = new BaseConfiguration();
-        config.setProperty(GREMLIN_GRAPH, AsterGraph.class.getName());
+        config.setProperty(Graph.GRAPH, AsterGraph.class.getName());
         config.setProperty(ASTER_UPDATE_POLICY, updatePolicy);
         return open(config);
     }
@@ -47,7 +56,9 @@ public class AsterGraph implements Graph, AutoCloseable {
 
     @Override
     public Vertex addVertex(final Object... keyValues) {
-        throw new UnsupportedOperationException("AsterGraph.addVertex() not yet implemented");
+        long id = currentVertexId;
+        currentVertexId++;
+        return store.addVertex(id);
     }
 
     @Override
@@ -62,12 +73,26 @@ public class AsterGraph implements Graph, AutoCloseable {
 
     @Override
     public Iterator<Vertex> vertices(final Object... vertexIds) {
-        throw new UnsupportedOperationException("AsterGraph.vertices() not yet implemented");
+        List<Object> idList = new ArrayList<>();
+        if (vertexIds == null || vertexIds.length == 0) {
+            for (long lid = 0L; lid < currentVertexId; lid++) {
+                idList.add(lid);
+            }
+        } else {
+            for (Object vid : vertexIds) {
+                long lid = Long.parseLong(String.valueOf(vid));
+                if (lid < currentVertexId) {
+                    idList.add(lid);
+                }
+            }
+        }
+        return IteratorUtils.map(idList, this::vertex).iterator();
     }
 
     @Override
     public Iterator<Edge> edges(final Object... edgeIds) {
-        throw new UnsupportedOperationException("AsterGraph.edges() not yet implemented");
+        // Edge iteration by ID is not fully supported in the current storage model
+        return Collections.emptyIterator();
     }
 
     @Override
@@ -92,46 +117,48 @@ public class AsterGraph implements Graph, AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        if (this.store != null) {
-            this.store.close();
-        }
+        this.store.close();
     }
 
     // --- AsterDB-specific methods ---
 
     public Edge addEdge(final AsterVertex outVertex, final AsterVertex inVertex, final String label, final Object... keyValues) {
-        throw new UnsupportedOperationException("AsterGraph.addEdge() not yet implemented");
+        return store.addEdge(outVertex, inVertex);
     }
 
     public void removeVertex(final Object vertexId) {
-        throw new UnsupportedOperationException("AsterGraph.removeVertex() not yet implemented");
+        store.removeVertex(Long.parseLong(String.valueOf(vertexId)));
     }
 
     public void removeEdge(final Object edgeId) {
-        throw new UnsupportedOperationException("AsterGraph.removeEdge() not yet implemented");
+        store.removeEdge(edgeId);
     }
 
     public Vertex vertex(final Object vertexId) {
-        throw new UnsupportedOperationException("AsterGraph.vertex() not yet implemented");
+        return store.getVertex(Long.parseLong(String.valueOf(vertexId)));
     }
 
     public void setWorkload(final float readRatio) {
-        throw new UnsupportedOperationException("AsterGraph.setWorkload() not yet implemented");
+        store.setWorkload(readRatio);
     }
 
     public void setCacheMissRate(final double ratio) {
-        throw new UnsupportedOperationException("AsterGraph.setCacheMissRate() not yet implemented");
+        store.setCacheMissRate(ratio);
     }
 
     public void addVertexProperty(final Object vertexId, final String key, final Object value) {
-        throw new UnsupportedOperationException("AsterGraph.addVertexProperty() not yet implemented");
+        store.addVertexProperty(Long.parseLong(String.valueOf(vertexId)), key, value);
     }
 
     public void addEdgeProperty(final Object edgeId, final String key, final Object value) {
-        throw new UnsupportedOperationException("AsterGraph.addEdgeProperty() not yet implemented");
+        store.addEdgeProperty(edgeId, key, value);
     }
 
     public long getCurrentVertexId() {
         return this.currentVertexId;
+    }
+
+    AsterGraphStore getStore() {
+        return this.store;
     }
 }
