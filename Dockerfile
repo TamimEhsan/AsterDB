@@ -50,6 +50,18 @@ RUN mvn install:install-file \
     -DlocalRepositoryPath=/root/.m2/repository
 RUN mvn clean install -pl asterdb-gremlin -Dmaven.test.skip=true
 
+# Download Apache Gremlin Console binary distribution (matches the gremlin-core
+# version asterdb-gremlin depends on) and unpack it to /root/gremlin-console.
+# bin/gremlin.sh in this repo delegates to it.
+ENV TINKERPOP_VERSION=4.0.0-beta.2
+RUN wget -q https://dlcdn.apache.org/tinkerpop/${TINKERPOP_VERSION}/apache-tinkerpop-gremlin-console-${TINKERPOP_VERSION}-bin.zip \
+        -O /tmp/gremlin-console.zip \
+    && apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/* \
+    && unzip -q /tmp/gremlin-console.zip -d /root/ \
+    && mv /root/apache-tinkerpop-gremlin-console-${TINKERPOP_VERSION} /root/gremlin-console \
+    && rm /tmp/gremlin-console.zip \
+    && chmod +x /root/gremlin-console/bin/gremlin.sh
+
 # Add entrypoint wrapper
 RUN printf '%s\n' '#!/usr/bin/env sh' \
   'set -e' \
