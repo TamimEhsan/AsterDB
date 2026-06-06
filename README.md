@@ -21,13 +21,7 @@ limitations under the License.
   <img src="./assets/asterdb-logo.png" alt="asterdb-logo">
 </p>
 
-[![maven-central](https://img.shields.io/maven-central/v/org.apache.tinkerpop/gremlin-driver?color=brightgreen)]("https://mvnrepository.com/artifact/org.apache.tinkerpop/gremlin-driver")
-[![nuget](https://img.shields.io/nuget/v/Gremlin.Net?color=brightgreen)](link="https://www.nuget.org/packages/Gremlin.Net")
-[![pypi](https://img.shields.io/pypi/v/gremlinpython?color=brightgreen)]("https://pypi.org/project/gremlinpython/")
-[![npm](https://img.shields.io/npm/v/gremlin?color=brightgreen)]("https://www.npmjs.com/package/gremlin")
-[![go module](https://badge.fury.io/go/github.com%2Fapache%2Ftinkerpop%2Fgremlin-go%2Fv3.svg)]("https://pkg.go.dev/github.com/apache/tinkerpop/gremlin-go/v3")
-[![codecov](https://codecov.io/gh/apache/tinkerpop/branch/master/graph/badge.svg?token=TojD2nR5Qd)]("https://codecov.io/gh/apache/tinkerpop")
-[![Javadoc](https://javadoc.io/badge/org.janusgraph/janusgraph-core.svg?color=blue)](https://javadoc.io/doc/org.janusgraph/janusgraph-core)
+[![tinkerpop](https://img.shields.io/maven-central/v/org.apache.tinkerpop/gremlin-core?label=tinkerpop&color=brightgreen)](https://mvnrepository.com/artifact/org.apache.tinkerpop/gremlin-core)
 [![License](https://img.shields.io/badge/license-Apache%202-0E78BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 
@@ -115,7 +109,7 @@ sudo make -j8 rocksdbjava DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 EXTRA_CXXFLAG
   <img src="./assets/session1.gif" alt="build-graphkv">
 </p>
 
-Build gremlin console for AsterDB:
+Build the AsterDB Gremlin provider:
 
 ```bash
 cd $USER_HOME_PATH/AsterDB/
@@ -126,8 +120,14 @@ mvn install:install-file \
     -Dversion=8.9.0 \
     -Dpackaging=jar \
     -DlocalRepositoryPath=/root/.m2/repository
-mvn clean install -pl tinkergraph-gremlin,gremlin-console -Dmaven.test.skip=true
+mvn clean install -pl asterdb-gremlin -Dmaven.test.skip=true
 ```
+
+AsterDB ships as a TinkerPop graph provider (the `asterdb-gremlin` module),
+and depends on Apache TinkerPop as a regular Maven dependency. To run the
+Gremlin Console interactively, download a matching Apache Gremlin Console
+distribution and point `GREMLIN_CONSOLE_HOME` at the unpacked directory
+(the Dockerfile does this automatically).
 
 <p align="center">
   <img src="./assets/session2.gif" alt="build-asterdb">
@@ -196,16 +196,16 @@ bin/gremlin.sh
 -----oOOo-(3)-oOOo-----
 plugin activated: tinkerpop.server
 plugin activated: tinkerpop.utilities
-plugin activated: tinkerpop.tinkergraph
+plugin activated: asterdb.gremlin
 gremlin> conf = new BaseConfiguration();
 ==>org.apache.commons.configuration2.BaseConfiguration@52454457
 gremlin> conf.setProperty("updatePolicy", 2); # adaptive
 ==>null
-gremlin> graph = TinkerGraph.open(conf);
+gremlin> graph = AsterGraph.open(conf);
 using update policy: 2
-==>tinkergraph[vertices:12290508 edges:937480664]
+==>astergraph[vertices:12290508 edges:937480664]
 gremlin> g = graph.traversal();
-==>graphtraversalsource[tinkergraph[vertices:12290508 edges:937480664], standard]
+==>graphtraversalsource[astergraph[vertices:12290508 edges:937480664], standard]
 gremlin> g.V().id().fold().next();
 ...
 ```

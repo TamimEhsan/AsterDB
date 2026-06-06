@@ -1,4 +1,4 @@
-package org.apache.tinkerpop;
+package org.asterdb.bench;
 
 import org.apache.tinkerpop.gremlin.language.grammar.GremlinAntlrToJava;
 import org.apache.tinkerpop.gremlin.language.grammar.VariableResolver;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.tinkerpop;
+package org.asterdb.bench;
 
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;

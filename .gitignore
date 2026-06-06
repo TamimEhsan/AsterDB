@@ -2,6 +2,7 @@ dataset/*
 *.log
 target/
 *.iml
+bin/bulkload
 **/.idea/
 *.iws
 *.DS_Store

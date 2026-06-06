@@ -35,7 +35,7 @@ warmup_arr.shuffle();
 
 conf = new BaseConfiguration();
 conf.setProperty("updatePolicy", 2); // adaptive
-graph = TinkerGraph.open(conf);
+graph = AsterGraph.open(conf);
 graph.setWorkload(rops / (wops + rops));
 g = graph.traversal();
 // graph.currentVertexId = 3072627;
