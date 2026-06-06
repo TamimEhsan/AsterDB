@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
 public class AsterGraph implements Graph, AutoCloseable {
@@ -24,6 +25,8 @@ public class AsterGraph implements Graph, AutoCloseable {
     private final Configuration configuration;
     private final AsterGraphFeatures features = new AsterGraphFeatures();
     private final AsterGraphStore store;
+    private final AsterVertexIndex vertexIndex;
+    private final AsterEdgeIndex edgeIndex;
     private long currentVertexId = 0L;
 
     private AsterGraph(final Configuration configuration) {
@@ -31,6 +34,8 @@ public class AsterGraph implements Graph, AutoCloseable {
         int updatePolicy = configuration.getInt(ASTER_UPDATE_POLICY, 0);
         RocksGraph db = AsterGraphStore.openDatabase(updatePolicy);
         this.store = new AsterGraphStore(db, this);
+        this.vertexIndex = new AsterVertexIndex(this);
+        this.edgeIndex = new AsterEdgeIndex(this);
         this.currentVertexId = store.vertexCount();
     }
 
@@ -160,5 +165,39 @@ public class AsterGraph implements Graph, AutoCloseable {
 
     AsterGraphStore getStore() {
         return this.store;
+    }
+
+    public Set<String> getIndexedKeys(final Class<? extends org.apache.tinkerpop.gremlin.structure.Element> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            return vertexIndex.getIndexedKeys();
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
+            return edgeIndex.getIndexedKeys();
+        } else {
+            return Collections.emptySet();
+        }
+    }
+
+    public List<? extends Vertex> queryVertexIndex(final String key, final Object value) {
+        return vertexIndex.get(key, value);
+    }
+
+    public List<? extends Edge> queryEdgeIndex(final String key, final Object value) {
+        return edgeIndex.get(key, value);
+    }
+
+    public void createIndex(final String key, final Class<? extends org.apache.tinkerpop.gremlin.structure.Element> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            vertexIndex.createKeyIndex(key);
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
+            edgeIndex.createKeyIndex(key);
+        }
+    }
+
+    public void dropIndex(final String key, final Class<? extends org.apache.tinkerpop.gremlin.structure.Element> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            vertexIndex.dropKeyIndex(key);
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
+            edgeIndex.dropKeyIndex(key);
+        }
     }
 }

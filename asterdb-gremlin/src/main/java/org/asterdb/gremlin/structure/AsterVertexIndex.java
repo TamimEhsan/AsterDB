@@ -1,5 +1,8 @@
 package org.asterdb.gremlin.structure;
 
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +17,17 @@ public class AsterVertexIndex {
     }
 
     public List<AsterVertex> get(final String key, final Object value) {
-        throw new UnsupportedOperationException("AsterVertexIndex.get() not yet implemented");
+        long[] vertexArray = graph.getStore().getVertexWithProperty(key, String.valueOf(value));
+        List<AsterVertex> result = new ArrayList<>();
+        for (long vertexId : vertexArray) {
+            AsterVertex vertex = new AsterVertex(vertexId, graph);
+            AsterVertexProperty<Object> property = new AsterVertexProperty<>(key, value);
+            List<VertexProperty> propertyList = new ArrayList<>();
+            propertyList.add(property);
+            vertex.properties.put(key, propertyList);
+            result.add(vertex);
+        }
+        return result;
     }
 
     public void createKeyIndex(final String key) {

@@ -1,5 +1,9 @@
 package org.asterdb.gremlin.structure;
 
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Property;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +18,18 @@ public class AsterEdgeIndex {
     }
 
     public List<AsterEdge> get(final String key, final Object value) {
-        throw new UnsupportedOperationException("AsterEdgeIndex.get() not yet implemented");
+        long[] edgeArray = graph.getStore().getEdgeWithProperty(key, String.valueOf(value));
+        List<AsterEdge> result = new ArrayList<>();
+        for (int i = 0; i < edgeArray.length; i += 2) {
+            long source = edgeArray[i];
+            long target = edgeArray[i + 1];
+            Object edgeId = target + "-" + source;
+            AsterEdge edge = new AsterEdge(edgeId, source, Edge.DEFAULT_LABEL, target, graph);
+            Property<Object> property = new AsterProperty<>(edge, key, value);
+            edge.properties.put(key, property);
+            result.add(edge);
+        }
+        return result;
     }
 
     public void createKeyIndex(final String key) {

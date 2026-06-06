@@ -21,7 +21,7 @@ public class AsterEdge extends AsterElement implements Edge {
     private final long outVertexId;
     private final long inVertexId;
     private final AsterGraph graph;
-    private Map<String, Property> properties;
+    Map<String, Property> properties;
 
     public AsterEdge(final Object id, final long outVertexId, final String label, final long inVertexId, final AsterGraph graph) {
         super(id, label);
