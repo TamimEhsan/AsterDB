@@ -30,7 +30,7 @@ public final class AsterGraphStepStrategy extends AbstractTraversalStrategy<Trav
             Step<?, ?> currentStep = asterGraphStep.getNextStep();
             while (currentStep instanceof HasStep || currentStep instanceof NoOpBarrierStep) {
                 if (currentStep instanceof HasStep) {
-                    for (final HasContainer hasContainer : ((HasContainerHolder) currentStep).getHasContainers()) {
+                    for (final HasContainer hasContainer : ((HasContainerHolder<?, ?>) currentStep).getHasContainers()) {
                         if (!GraphStep.processHasContainerIds(asterGraphStep, hasContainer))
                             asterGraphStep.addHasContainer(hasContainer);
                     }

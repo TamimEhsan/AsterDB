@@ -2,6 +2,7 @@ package org.asterdb.gremlin;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.AbstractGraphProvider;
+import org.apache.tinkerpop.gremlin.LoadGraphWith;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.asterdb.gremlin.structure.AsterEdge;
 import org.asterdb.gremlin.structure.AsterElement;
@@ -27,7 +28,7 @@ public class AsterGraphProvider extends AbstractGraphProvider {
 
     @Override
     public Map<String, Object> getBaseConfiguration(final String graphName, final Class<?> test,
-                                                     final String testMethodName, final Graph.Variables.Exceptions exceptionType) {
+                                                     final String testMethodName, final LoadGraphWith.GraphData loadGraphWith) {
         return Map.of(
                 Graph.GRAPH, AsterGraph.class.getName(),
                 "updatePolicy", 0

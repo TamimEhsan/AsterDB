@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public final class AsterGraphStep<S, E extends Element> extends GraphStep<S, E> implements HasContainerHolder, AutoCloseable {
+public final class AsterGraphStep<S, E extends Element> extends GraphStep<S, E> implements HasContainerHolder<S, E>, AutoCloseable {
 
     private final List<HasContainer> hasContainers = new ArrayList<>();
     private final List<Iterator> iterators = new ArrayList<>();
@@ -36,7 +36,7 @@ public final class AsterGraphStep<S, E extends Element> extends GraphStep<S, E> 
         final AsterGraph graph = (AsterGraph) this.getTraversal().getGraph().get();
         final HasContainer indexedContainer = getIndexKey(Vertex.class);
         Iterator<? extends Vertex> iterator;
-        final Object[] resolvedIds = this.getIdsAsValues();
+        final Object[] resolvedIds = this.getIds();
 
         if (null == resolvedIds)
             iterator = Collections.emptyIterator();
@@ -58,7 +58,7 @@ public final class AsterGraphStep<S, E extends Element> extends GraphStep<S, E> 
         final AsterGraph graph = (AsterGraph) this.getTraversal().getGraph().get();
         final HasContainer indexedContainer = getIndexKey(Edge.class);
         Iterator<Edge> iterator;
-        final Object[] resolvedIds = this.getIdsAsValues();
+        final Object[] resolvedIds = this.getIds();
 
         if (null == resolvedIds)
             iterator = Collections.emptyIterator();
