@@ -123,11 +123,27 @@ mvn install:install-file \
 mvn clean install -pl asterdb-gremlin -Dmaven.test.skip=true
 ```
 
-AsterDB ships as a TinkerPop graph provider (the `asterdb-gremlin` module),
-and depends on Apache TinkerPop as a regular Maven dependency. To run the
-Gremlin Console interactively, download a matching Apache Gremlin Console
-distribution and point `GREMLIN_CONSOLE_HOME` at the unpacked directory
-(the Dockerfile does this automatically).
+AsterDB ships as a TinkerPop graph provider (the `asterdb-gremlin` module) and
+depends on Apache TinkerPop as a regular Maven dependency. `build_db.sh` runs
+the two `mvn` commands above for you and also stages the provider's runtime
+dependencies into `asterdb-gremlin/target/dependency/`.
+
+To use the interactive Gremlin Console locally, download a matching Apache
+Gremlin Console distribution and point `GREMLIN_CONSOLE_HOME` at it. `bin/gremlin.sh`
+then installs the AsterDB plugin (the provider jar plus `rocksdbjni`/`commons-io`)
+into the console automatically on first run:
+
+```bash
+cd $USER_HOME_PATH
+VERSION=4.0.0-beta.2
+wget https://archive.apache.org/dist/tinkerpop/${VERSION}/apache-tinkerpop-gremlin-console-${VERSION}-bin.zip
+unzip apache-tinkerpop-gremlin-console-${VERSION}-bin.zip
+export GREMLIN_CONSOLE_HOME=$USER_HOME_PATH/apache-tinkerpop-gremlin-console-${VERSION}
+```
+
+> The Docker image does all of this for you — see [Docker Image](#docker-image).
+> The console only adds `ext/<plugin>/plugin/*` to its classpath, which is why
+> the provider jar **and** its dependencies are installed there together.
 
 <p align="center">
   <img src="./assets/session2.gif" alt="build-asterdb">
@@ -199,7 +215,7 @@ plugin activated: tinkerpop.utilities
 plugin activated: asterdb.gremlin
 gremlin> conf = new BaseConfiguration();
 ==>org.apache.commons.configuration2.BaseConfiguration@52454457
-gremlin> conf.setProperty("updatePolicy", 2); # adaptive
+gremlin> conf.setProperty("updatePolicy", 2);
 ==>null
 gremlin> graph = AsterGraph.open(conf);
 using update policy: 2
