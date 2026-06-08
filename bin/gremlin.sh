@@ -25,13 +25,22 @@ if [ -z "${GREMLIN_CONSOLE_HOME:-}" ]; then
     fi
 fi
 
-# Ensure asterdb-gremlin jar is on the console's ext path.
-ASTERDB_EXT="$GREMLIN_CONSOLE_HOME/ext/asterdb-gremlin"
-ASTERDB_JAR="$REPO_ROOT/asterdb-gremlin/target/asterdb-gremlin-1.0.0-SNAPSHOT.jar"
-if [ -f "$ASTERDB_JAR" ] && [ ! -L "$ASTERDB_EXT" ]; then
-    mkdir -p "$ASTERDB_EXT/plugin" "$ASTERDB_EXT/lib"
-    cp "$ASTERDB_JAR" "$ASTERDB_EXT/plugin/" 2>/dev/null || true
-    cp "$ASTERDB_JAR" "$ASTERDB_EXT/lib/" 2>/dev/null || true
+# Install AsterDB as a console plugin. The console only adds ext/<name>/plugin/*
+# to its classpath, so the asterdb-gremlin jar AND its runtime dependencies
+# (rocksdbjni, commons-io) must all live in plugin/.
+#
+# The Dockerfile pre-populates this at image-build time. For local development,
+# this block syncs from the build output — run the following once first:
+#   mvn -pl asterdb-gremlin package dependency:copy-dependencies -DincludeScope=runtime
+ASTERDB_PLUGIN="$GREMLIN_CONSOLE_HOME/ext/asterdb-gremlin/plugin"
+ASTERDB_TARGET="$REPO_ROOT/asterdb-gremlin/target"
+ASTERDB_JAR=$(ls "$ASTERDB_TARGET"/asterdb-gremlin-*.jar 2>/dev/null | head -1 || true)
+if [ -n "$ASTERDB_JAR" ]; then
+    mkdir -p "$ASTERDB_PLUGIN"
+    cp "$ASTERDB_JAR" "$ASTERDB_PLUGIN/" 2>/dev/null || true
+    if [ -d "$ASTERDB_TARGET/dependency" ]; then
+        cp "$ASTERDB_TARGET"/dependency/*.jar "$ASTERDB_PLUGIN/" 2>/dev/null || true
+    fi
 fi
 
 exec "$GREMLIN_CONSOLE_HOME/bin/gremlin.sh" "$@"
